@@ -23,4 +23,8 @@ I'll try to use some design patterns such as Singleton, Factory, Strategy, and M
    -  Parse responses from the Ollama API.
    -  Display the response to the user in the console.
 4. **Storing Interactions in MongoDB**
-5. **coming soon**
+   - Storing Interaction in MongoDB
+   - Retrieving all Interactions from MongoDB
+   - Retrieving documents containing a specific string in the question field
+   - Adding a new field to the database to record keywords in the questions
+5. **Coming soon**

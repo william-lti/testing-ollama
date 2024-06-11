@@ -1,8 +1,9 @@
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.*;
 import org.bson.Document;
+
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MongoDBService {
     private static final String CONNECTION_STRING = "mongodb://localhost:27017";
@@ -12,7 +13,7 @@ public class MongoDBService {
     private MongoCollection<Document> collection;
 
     public MongoDBService() {
-        MongoClient mongoClient = MongoClients.create(CONNECTION_STRING);
+        MongoClient mongoClient = MongoClients.create(CONNECTION_STRING); //MongoClients is a utility class that provides static factory methods for creating MongoClient instances.
         MongoDatabase database = mongoClient.getDatabase(DATABASE_NAME);
         this.collection = database.getCollection(COLLECTION_NAME);
     }
@@ -24,8 +25,42 @@ public class MongoDBService {
         collection.insertOne(doc);
     }
 
-    public void getAllInteractions() {
-        // Implement method to retrieve and display all interactions
+    public List<Interaction> getAllInteractions() {
+        List<Interaction> interactions = new ArrayList<>();
+        FindIterable<Document> documents = collection.find();
+
+        //Mapping Documents to Interaction objects
+        for(Document doc : documents){
+            Interaction interaction = new Interaction();
+            interaction.setId(doc.getObjectId("_id"));
+            interaction.setQuestion(doc.getString("question"));
+            interaction.setAnswer(doc.getString("answer"));
+            interaction.setTimestamp(doc.getDate("timestamp").toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime());
+        }
+
+        return interactions;
+    }
+    public List<Interaction> getAllInteractionsByQuestion(String search) {
+        List<Interaction> interactions = new ArrayList<>();
+        String regexQuery = ".*" + search.toLowerCase() + ".*";
+        Document query = new Document("question", new Document("$regex", regexQuery).append("$options", "i")); //Using $options field set to i for case-insensitive matching.
+        FindIterable<Document> documents = collection.find(query);
+
+        for (Document doc : documents) {
+            Interaction interaction = new Interaction();
+            interaction.setId(doc.getObjectId("_id"));
+            interaction.setQuestion(doc.getString("question"));
+            interaction.setAnswer(doc.getString("answer"));
+            interaction.setTimestamp(doc.getDate("timestamp").toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime());
+            interactions.add(interaction);
+        }
+
+        return interactions;
+
     }
 
 

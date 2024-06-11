@@ -15,6 +15,12 @@ public class Interaction {
         this.answer = answer;
         this.timestamp = LocalDateTime.now();
     }
+    public Interaction(){
+        this.question = "";
+        this.answer = "answer";
+        this.timestamp = LocalDateTime.now();
+    }
+
 
     public ObjectId getId() {
         return id;
