@@ -1,4 +1,6 @@
 import com.mongodb.client.*;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import org.bson.Document;
 
 import java.time.ZoneId;
@@ -62,7 +64,8 @@ public class MongoDBService {
         return interactions;
 
     }
-
-
+    public void updateInteractionWithTags(String question, List<String> tags) {
+        collection.updateOne(Filters.eq("question", question), Updates.set("tags", tags));
+    }
 
 }

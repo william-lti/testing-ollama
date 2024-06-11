@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -14,6 +15,7 @@ public class Main {
             }
             try{
                 String answer = service.askGrammarQuestion(question);
+                List<String> tags = service.generateTags(question);
                 System.out.println("Then answer is: "+ answer);
             } catch (Exception e) {
                 e.printStackTrace();

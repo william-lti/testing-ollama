@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OllamaApiService {
     /*
@@ -90,6 +92,60 @@ public class OllamaApiService {
             throw e;
         }
     }
+    public List<String> generateTags(String question) throws Exception {
+        List<String> tags = new ArrayList<>();
+        String prompt = "Generate a list of tags that can be used to identify/catalog the given question so it can be analyzed in the future in terms of language. Only output a list of tags separated by commas. Question: " + question;
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            // Create HttpPost request
+            HttpPost request = new HttpPost(BASE_URL + ENDPOINT);
+            request.setHeader("Content-Type", "application/json");
+
+            // Create JSON payload
+            GrammarRequest grammarRequest = new GrammarRequest(prompt,MODEL);
+            String jsonPayload = objectMapper.writeValueAsString(grammarRequest);
+            request.setEntity(new StringEntity(jsonPayload));
+
+            // Log the request payload
+            //logger.debug("Sending jasonPayload: {}", jsonPayload);
+
+            // Execute the request
+            try (CloseableHttpResponse response = httpClient.execute(request)) {
+                InputStreamReader stream = new InputStreamReader(response.getEntity().getContent());
+                BufferedReader reader = new BufferedReader(stream);
+                StringBuilder completeResponse = new StringBuilder();
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Log the raw response chunk
+                    //logger.info("API Response Chunk: " + line);
+
+                    // Deserialize response chunk
+                    GrammarResponse grammarResponse = objectMapper.readValue(line, GrammarResponse.class);
+
+                    // Accumulate response
+                    completeResponse.append(grammarResponse.getResponse());
+
+
+                    // Check for errors in the response
+                    if (grammarResponse.getError() != null) {
+                        logger.error("API Error: " + grammarResponse.getError());
+                        throw new Exception("API Error: " + grammarResponse.getError());
+                    }
+                }
+                String answer = completeResponse.toString();
+                for(String word : answer.split(",")){
+                    tags.add(word);
+
+                }
+                mongoDBService.updateInteractionWithTags(question, tags);
+                return tags;
+            }
+        }catch (Exception e) {
+            logger.error("Exception occurred while asking grammar question", e);
+            throw e;
+        }
+    }
+
     /*
     I don't generally use inner classes so here is a brief explanation of the rationale behind of it:
     Encapsulation:
