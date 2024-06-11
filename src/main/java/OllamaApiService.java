@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class OllamaApiService {
-
     /*
         Here we set the url to call the ollama API
         The url comes from the corresponding ollama docker desktop container
@@ -30,6 +29,7 @@ public class OllamaApiService {
     private static final String BASE_URL = "http://localhost:11434/api";
     private static final String ENDPOINT = "/generate";
     private static final String MODEL = "llama3:latest";
+    private final MongoDBService mongoDBService= new MongoDBService();
     private final ObjectMapper objectMapper = new ObjectMapper(); // ObjectMapper is a class from the Jackson library used for processing JSON un java.
     private static final Logger logger = LoggerFactory.getLogger(OllamaApiService.class);
     /*
@@ -79,8 +79,11 @@ public class OllamaApiService {
                         throw new Exception("API Error: " + grammarResponse.getError());
                     }
                 }
+                String answer = completeResponse.toString();
 
-                return completeResponse.toString();
+                mongoDBService.saveInteraction(new Interaction(question, answer));
+
+                return answer;
             }
         }catch (Exception e) {
             logger.error("Exception occurred while asking grammar question", e);
