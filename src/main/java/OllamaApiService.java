@@ -94,7 +94,14 @@ public class OllamaApiService {
     }
     public List<String> generateTags(String question) throws Exception {
         List<String> tags = new ArrayList<>();
-        String prompt = "Generate a list of tags that can be used to identify/catalog the given question so it can be analyzed in the future in terms of language. Only output a list of tags separated by commas. Question: " + question;
+        String prompt = "Acting as an expert linguist who has vast experience in tagging texts, " +
+                "generate a list of descriptive tags for the following English grammar question. " +
+                "The tags must include: the grammar topic, the gramamr rule/s, difficulty level and CEFR level. " +
+                "If relevant, it could also include parts of speech, lingusitc term and any specific grammar terms used. " +
+                "Avoid any tag that is too general or not specific to que given question. " +
+                "Tags should reflect the topic of what is being asked. " +
+                "Only output a list of tags separated by commas. " +
+                "If the question is in Sapnish, analyze it in English. Question: " + question;
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             // Create HttpPost request
             HttpPost request = new HttpPost(BASE_URL + ENDPOINT);

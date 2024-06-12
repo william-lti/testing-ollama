@@ -22,14 +22,21 @@ I'll try to use some design patterns such as Singleton, Factory, Strategy, and M
    -  Capture user input and send it to the Ollama API.
    -  Parse responses from the Ollama API.
    -  Display the response to the user in the console.
+   
 4. **Storing Interactions in MongoDB**
    - Storing Interaction in MongoDB.
    - Retrieving all Interactions from MongoDB.
    - Retrieving documents containing a specific string in the question field.
    - Adding a new field to the database to record keywords in the questions.
+   
 5. **Adding Tags to Interactions**
    - Modify the Interaction Class with a List of strings to record tags.
    - Generate a list of tags from ollama.
    - Update the existing interaction in MongoDB with the generated tags.
-6. **Next step: Improve code**
+   
+6. **Refining tags**
+   - Generate several prompts to try with ollama3
+   - Select the best prompt
+   - Update prompt in the code
+7. **Next step: Improve code**
 
